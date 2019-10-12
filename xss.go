@@ -5,26 +5,41 @@ import (
 	"net/http"
 )
 
-func XSS(mode string, nosniff bool, next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var (
-			contentOptions = r.Header.Get(headerContentTypeOptions)
-			xss            = r.Header.Get(headerXSSProtection)
-		)
-		w.Header().Set(headerContentTypeOptions, contentOptions)
-		w.Header().Set(headerXSSProtection, xss)
+type XSS struct {
+	mode    string
+	nosniff bool
+}
 
-		if xss == "" {
-			for _, contentType := range htmlContentTypes {
-				if contentType == r.Header.Get(headerContentType) {
-					w.Header().Set(headerXSSProtection, fmt.Sprintf("1; mode=%s", mode))
-					break
-				}
+func NewXSS(mode string, nosniff bool) XSS {
+	return XSS{
+		mode:    mode,
+		nosniff: nosniff,
+	}
+}
+
+func (m XSS) Handler(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(headerContentTypeOptions, r.Header.Get(headerContentTypeOptions))
+		w.Header().Set(headerXSSProtection, r.Header.Get(headerXSSProtection))
+
+		if m.isNotEmpty(r) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		for _, contentType := range htmlContentTypes {
+			if contentType == r.Header.Get(headerContentType) {
+				w.Header().Set(headerXSSProtection, fmt.Sprintf("1; mode=%s", m.mode))
+				break
 			}
 		}
-		if contentOptions == "" && nosniff {
+		if m.nosniff {
 			w.Header().Set(headerContentTypeOptions, "nosniff")
 		}
+
 		next.ServeHTTP(w, r)
 	}
+}
+
+func (m XSS) isNotEmpty(r *http.Request) bool {
+	return r.Header.Get(headerContentTypeOptions) != "" && r.Header.Get(headerXSSProtection) != ""
 }

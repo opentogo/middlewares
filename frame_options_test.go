@@ -10,9 +10,10 @@ import (
 
 func TestFrameOptions(t *testing.T) {
 	var (
-		r = httptest.NewRequest(http.MethodGet, "/", nil)
-		w = httptest.NewRecorder()
-		h = func(w http.ResponseWriter, r *http.Request) {}
+		r            = httptest.NewRequest(http.MethodGet, "/", nil)
+		w            = httptest.NewRecorder()
+		h            = func(w http.ResponseWriter, r *http.Request) {}
+		frameOptions = NewFrameOptions("SAMEORIGIN")
 	)
 
 	t.Run("setting 'X-Frame-Options' header for HTML content-types", func(t *testing.T) {
@@ -21,7 +22,7 @@ func TestFrameOptions(t *testing.T) {
 
 			t.Run(contentType, func(t *testing.T) {
 				r.Header.Set(headerContentType, contentType)
-				http.HandlerFunc(FrameOptions("SAMEORIGIN", h)).ServeHTTP(w, r)
+				http.HandlerFunc(frameOptions.Handler(h)).ServeHTTP(w, r)
 
 				assert.Equal(t, "SAMEORIGIN", w.Header().Get(headerFrameOptions))
 			})
@@ -32,7 +33,7 @@ func TestFrameOptions(t *testing.T) {
 		w.Header().Del(headerFrameOptions)
 
 		r.Header.Set(headerContentType, "application/json")
-		http.HandlerFunc(FrameOptions("SAMEORIGIN", h)).ServeHTTP(w, r)
+		http.HandlerFunc(frameOptions.Handler(h)).ServeHTTP(w, r)
 
 		assert.Equal(t, "", w.Header().Get(headerFrameOptions))
 	})
@@ -43,7 +44,7 @@ func TestFrameOptions(t *testing.T) {
 		r.Header.Set(headerFrameOptions, "ALLOW")
 		r.Header.Set(headerContentType, "text/html")
 
-		http.HandlerFunc(FrameOptions("SAMEORIGIN", h)).ServeHTTP(w, r)
+		http.HandlerFunc(frameOptions.Handler(h)).ServeHTTP(w, r)
 
 		assert.Equal(t, "ALLOW", w.Header().Get(headerFrameOptions))
 	})

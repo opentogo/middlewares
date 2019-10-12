@@ -10,9 +10,10 @@ import (
 
 func TestXSS(t *testing.T) {
 	var (
-		r = httptest.NewRequest(http.MethodGet, "/", nil)
-		w = httptest.NewRecorder()
-		h = func(w http.ResponseWriter, r *http.Request) {}
+		r       = httptest.NewRequest(http.MethodGet, "/", nil)
+		w       = httptest.NewRecorder()
+		handler = func(w http.ResponseWriter, r *http.Request) {}
+		xss     = NewXSS("block", true)
 	)
 
 	t.Run("setting 'X-XSS-Protection' header for HTML content-types", func(t *testing.T) {
@@ -22,7 +23,8 @@ func TestXSS(t *testing.T) {
 
 			t.Run(contentType, func(t *testing.T) {
 				r.Header.Set(headerContentType, contentType)
-				http.HandlerFunc(XSS("block", true, h)).ServeHTTP(w, r)
+
+				http.HandlerFunc(xss.Handler(handler)).ServeHTTP(w, r)
 
 				assert.Equal(t, "1; mode=block", w.Header().Get(headerXSSProtection))
 			})
@@ -34,7 +36,7 @@ func TestXSS(t *testing.T) {
 		w.Header().Del(headerXSSProtection)
 
 		r.Header.Set(headerContentType, "application/json")
-		http.HandlerFunc(XSS("block", true, h)).ServeHTTP(w, r)
+		http.HandlerFunc(xss.Handler(handler)).ServeHTTP(w, r)
 
 		assert.Equal(t, "", w.Header().Get(headerXSSProtection))
 	})
@@ -45,7 +47,7 @@ func TestXSS(t *testing.T) {
 
 		r.Header.Set(headerContentType, "text/html")
 
-		http.HandlerFunc(XSS("block", true, h)).ServeHTTP(w, r)
+		http.HandlerFunc(xss.Handler(handler)).ServeHTTP(w, r)
 
 		assert.Equal(t, "nosniff", w.Header().Get(headerContentTypeOptions))
 	})
@@ -58,7 +60,7 @@ func TestXSS(t *testing.T) {
 		r.Header.Set(headerXSSProtection, "1; mode=foo")
 		r.Header.Set(headerContentType, "text/html")
 
-		http.HandlerFunc(XSS("block", true, h)).ServeHTTP(w, r)
+		http.HandlerFunc(xss.Handler(handler)).ServeHTTP(w, r)
 
 		assert.Equal(t, "sniff", w.Header().Get(headerContentTypeOptions))
 		assert.Equal(t, "1; mode=foo", w.Header().Get(headerXSSProtection))
