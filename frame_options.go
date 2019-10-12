@@ -15,9 +15,9 @@ func NewFrameOptions(option string) FrameOptions {
 func (m FrameOptions) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		frameOptions := r.Header.Get(headerFrameOptions)
-		w.Header().Set(headerFrameOptions, frameOptions)
-
 		if frameOptions != "" {
+			w.Header().Set(headerFrameOptions, frameOptions)
+
 			next.ServeHTTP(w, r)
 			return
 		}

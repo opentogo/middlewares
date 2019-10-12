@@ -19,10 +19,10 @@ func NewXSS(mode string, nosniff bool) XSS {
 
 func (m XSS) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(headerContentTypeOptions, r.Header.Get(headerContentTypeOptions))
-		w.Header().Set(headerXSSProtection, r.Header.Get(headerXSSProtection))
-
 		if m.isNotEmpty(r) {
+			w.Header().Set(headerContentTypeOptions, r.Header.Get(headerContentTypeOptions))
+			w.Header().Set(headerXSSProtection, r.Header.Get(headerXSSProtection))
+
 			next.ServeHTTP(w, r)
 			return
 		}
