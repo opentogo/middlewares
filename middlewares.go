@@ -11,6 +11,7 @@ const (
 	headerFrameOptions       = "X-Frame-Options"
 	headerRealIP             = "X-Real-IP"
 	headerRemoteReferer      = "Referer"
+	headerStrictTransport    = "Strict-Transport-Security"
 	headerXSSProtection      = "X-XSS-Protection"
 )
 
@@ -45,6 +46,7 @@ handler := NewMiddleware(
 	NewFrameOptions("SAMEORIGIN"),
 	NewIPSpoofing(),
 	NewRemoteReferer([]string{http.MethodGet})
+	NewStrictTransport(31536000, false, false),
 	NewXSS("block", true),
 )
 */
