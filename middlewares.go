@@ -9,6 +9,9 @@ const (
 	headerContentTypeOptions = "X-Content-Type-Options"
 	headerForwardedFor       = "X-Forwarded-For"
 	headerFrameOptions       = "X-Frame-Options"
+	headerOrigin             = "Origin"
+	headerOriginHTTP         = "HTTP_ORIGIN"
+	headerOriginXHTTP        = "HTTP_X_ORIGIN"
 	headerPathInfo           = "PATH_INFO"
 	headerRealIP             = "X-Real-IP"
 	headerRemoteReferer      = "Referer"
@@ -46,6 +49,7 @@ handler := NewMiddleware(
 	handler,
 	NewFrameOptions("SAMEORIGIN"),
 	NewIPSpoofing(),
+	NewOrigin([]string{"http://example.org"}),
 	NewPathTraversal(),
 	NewRemoteReferer([]string{http.MethodGet})
 	NewStrictTransport(31536000, false, false),
