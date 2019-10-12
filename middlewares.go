@@ -33,26 +33,21 @@ var safeMethods = []string{
 	http.MethodTrace,
 }
 
+var middlewares []Middleware
+
 type Middleware interface {
 	Handler(http.HandlerFunc) http.HandlerFunc
 }
 
-func NewMiddleware(handler http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {
+func Use(middleware ...Middleware) {
+	if len(middleware) > 0 {
+		middlewares = append(middlewares, middleware...)
+	}
+}
+
+func Handle(handler http.HandlerFunc) http.HandlerFunc {
 	for _, middleware := range middlewares {
 		handler = middleware.Handler(handler)
 	}
 	return handler
 }
-
-/*
-handler := NewMiddleware(
-	handler,
-	NewFrameOptions("SAMEORIGIN"),
-	NewIPSpoofing(),
-	NewOrigin([]string{"http://example.org"}),
-	NewPathTraversal(),
-	NewRemoteReferer([]string{http.MethodGet})
-	NewStrictTransport(31536000, false, false),
-	NewXSS("block", true),
-)
-*/
