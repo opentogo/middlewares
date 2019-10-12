@@ -3,10 +3,13 @@ package middlewares
 import "net/http"
 
 const (
+	headerClientIP           = "X-Client-IP"
 	headerContentLength      = "Content-Length"
 	headerContentType        = "Content-Type"
 	headerContentTypeOptions = "X-Content-Type-Options"
+	headerForwardedFor       = "X-Forwarded-For"
 	headerFrameOptions       = "X-Frame-Options"
+	headerRealIP             = "X-Real-IP"
 	headerRemoteReferer      = "Referer"
 	headerXSSProtection      = "X-XSS-Protection"
 )
@@ -39,8 +42,9 @@ func NewMiddleware(handler http.HandlerFunc, middlewares ...Middleware) http.Han
 /*
 handler := NewMiddleware(
 	handler,
-	NewXSS("block", true),
 	NewFrameOptions("SAMEORIGIN"),
+	NewIPSpoofing(),
 	NewRemoteReferer([]string{http.MethodGet})
+	NewXSS("block", true),
 )
 */
