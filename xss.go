@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-// XSS type
+// XSS type to set X-XSS-Protection mode and X-Content-Type-Options for nosniff
+// It protects from  cross-site scripting (XSS) attack.
 type XSS struct {
 	mode    string
 	nosniff bool
@@ -19,7 +20,7 @@ func NewXSS(mode string, nosniff bool) XSS {
 	}
 }
 
-// Handler sets X-XSS-Protection header of Response
+// Handler sets X-XSS-Protection header and  X-Content-Type-Options of Response
 func (m XSS) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if m.isNotEmpty(r) {

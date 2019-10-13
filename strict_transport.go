@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-// StrictTransport type
+// StrictTransport type to set Strict-Transport-Security.
+// This tells browser to load site only on HTTPS.
 type StrictTransport struct {
 	maxAge            int
 	includeSubdomains bool
