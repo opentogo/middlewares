@@ -5,11 +5,13 @@ import (
 	"net/http"
 )
 
+// XSS type
 type XSS struct {
 	mode    string
 	nosniff bool
 }
 
+// NewXSS creates a new instance of XSS
 func NewXSS(mode string, nosniff bool) XSS {
 	return XSS{
 		mode:    mode,
@@ -17,6 +19,7 @@ func NewXSS(mode string, nosniff bool) XSS {
 	}
 }
 
+// Handler sets X-XSS-Protection header of Response
 func (m XSS) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if m.isNotEmpty(r) {

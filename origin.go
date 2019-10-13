@@ -7,16 +7,21 @@ import (
 	"strings"
 )
 
+// Origin type to maintain slice of whitelist origins
+// It protects against unsafe HTTP requests when value of Origin HTTP request
+// header doesn't match default or whitelisted URIs.
 type Origin struct {
 	whitelist []string
 }
 
+// NewOrigin creates new instance of Origin type
 func NewOrigin(whitelist []string) Origin {
 	return Origin{
 		whitelist: whitelist,
 	}
 }
 
+// Handler checks if request is coming from whitelisted origin
 func (m Origin) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var origin string

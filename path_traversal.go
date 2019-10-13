@@ -8,12 +8,16 @@ import (
 	"strings"
 )
 
+// PathTraversal type. It protects against unauthorized access to file system attacks,
+// unescapes '/' and '.' from PATH_INFO
 type PathTraversal struct{}
 
+// NewPathTraversal create new instance of PathTraversal
 func NewPathTraversal() PathTraversal {
 	return PathTraversal{}
 }
 
+// Handler checks for url if file path is being accessed.
 func (m PathTraversal) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Set(headerPathInfo, m.cleaner(r.Header.Get(headerPathInfo)))

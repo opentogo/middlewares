@@ -5,12 +5,15 @@ import (
 	"strings"
 )
 
+// IPSpoofing type used to detect IP spoofing attacks.
 type IPSpoofing struct{}
 
+// NewIPSpoofing creates a new instance of IPSpoofing
 func NewIPSpoofing() IPSpoofing {
 	return IPSpoofing{}
 }
 
+// Handler checks if request of safe against IPSpoofing attacks
 func (m IPSpoofing) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (

@@ -5,12 +5,14 @@ import (
 	"net/http"
 )
 
+// StrictTransport type
 type StrictTransport struct {
 	maxAge            int
 	includeSubdomains bool
 	preload           bool
 }
 
+// NewStrictTransport creates new instance of StrictTransport
 func NewStrictTransport(maxAge int, includeSubdomains, preload bool) StrictTransport {
 	return StrictTransport{
 		maxAge:            maxAge,
@@ -19,6 +21,7 @@ func NewStrictTransport(maxAge int, includeSubdomains, preload bool) StrictTrans
 	}
 }
 
+// Handler sets Strict-Transport-Security header of response
 func (m StrictTransport) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(

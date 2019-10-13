@@ -6,16 +6,20 @@ import (
 	"strings"
 )
 
+// RemoteReferer type. It doesn't accept unsafe HTTP requests if the Referer
+// header is set to a different host
 type RemoteReferer struct {
 	methods []string
 }
 
+// NewRemoteReferer creates new instance of RemoteReferer
 func NewRemoteReferer(methods []string) RemoteReferer {
 	return RemoteReferer{
 		methods: methods,
 	}
 }
 
+// Handler checks if HTTP request is safe.
 func (m RemoteReferer) Handler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if m.isURLSafe(r) || m.isMethodFiltered(r) || m.isMethodSafe(r) {
